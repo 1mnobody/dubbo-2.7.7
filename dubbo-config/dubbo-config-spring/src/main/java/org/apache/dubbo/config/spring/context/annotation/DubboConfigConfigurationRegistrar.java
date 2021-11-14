@@ -53,6 +53,7 @@ public class DubboConfigConfigurationRegistrar implements ImportBeanDefinitionRe
         }
 
         // Since 2.7.6
+        // 在这里注入 ReferenceAnnotationBeanPostProcessor，用于处理 Dubbo Reference 注解的field。
         registerCommonBeans(registry);
     }
 }

@@ -55,6 +55,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
 
         Set<String> packagesToScan = getPackagesToScan(importingClassMetadata);
 
+        // 注入 ServiceAnnotationBeanPostProcessor，用于处理 Dubbo Service 注解的field。
         registerServiceAnnotationBeanPostProcessor(packagesToScan, registry);
 
         // @since 2.7.6 Register the common beans

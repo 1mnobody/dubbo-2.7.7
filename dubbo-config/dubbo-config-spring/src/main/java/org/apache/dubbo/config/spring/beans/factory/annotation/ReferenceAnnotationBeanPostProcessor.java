@@ -92,6 +92,8 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
      * {@link DubboReference @DubboReference} has been supported since 2.7.7
      */
     public ReferenceAnnotationBeanPostProcessor() {
+        // 这里把 父类中的 annotationTypes 属性配置成以下三个注解，在扫描bean时，只会关注这三个注解标注的field，
+        // 初始化这些field时（AbstractAnnotationBeanPostProcessor#postProcessPropertyValues）会调用到本类中的 doGetInjectedBean 方法
         super(DubboReference.class, Reference.class, com.alibaba.dubbo.config.annotation.Reference.class);
     }
 
@@ -125,6 +127,14 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
         return Collections.unmodifiableMap(injectedMethodReferenceBeanCache);
     }
 
+    /**
+     * 调用链 AbstractAnnotationBeanPostProcessor#postProcessPropertyValues （spring 的bean后处理器回调方法）：搜索要注入的 Dubbo 服务（比如DubboReference，Reference注解的field）
+     *         ...
+     *   -->     AbstractAnnotationBeanPostProcessor.AnnotatedFieldElement#inject：实例化 Dubbo 服务，注入到实际的 field 中（比如，将生成的 DemoService 注入到 DemoServiceComponent 的 demoService 属性中）
+     *             AbstractAnnotationBeanPostProcessor#getInjectedObject：获取要注入的 dubbo 服务（缓存获取或者新建）
+     *               AbstractAnnotationBeanPostProcessor#doGetInjectedBean： 进入到下面这个方法新建Dubbo服务
+     *   --> 所指方法执行完之后，DubboReference 注入就完成了
+     */
     @Override
     protected Object doGetInjectedBean(AnnotationAttributes attributes, Object bean, String beanName, Class<?> injectedType,
                                        InjectionMetadata.InjectedElement injectedElement) throws Exception {
@@ -138,6 +148,7 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
          */
         String referenceBeanName = getReferenceBeanName(attributes, injectedType);
 
+        // 创建 ReferenceBean，ReferenceBean是实现了FactoryBean的，关注其中的getObject方法即可
         ReferenceBean referenceBean = buildReferenceBeanIfAbsent(referenceBeanName, attributes, injectedType);
 
         boolean localServiceBean = isLocalServiceBean(referencedBeanName, referenceBean, attributes);

@@ -47,6 +47,7 @@ import static com.alibaba.spring.util.AnnotatedBeanDefinitionRegistryUtils.regis
 
 /**
  * DubboNamespaceHandler
+ * xml配置文件的方式注入，借助此类来完成解析具体的xml元素
  *
  * @export
  */
