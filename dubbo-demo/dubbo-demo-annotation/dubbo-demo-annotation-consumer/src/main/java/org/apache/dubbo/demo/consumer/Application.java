@@ -16,10 +16,15 @@
  */
 package org.apache.dubbo.demo.consumer;
 
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.common.constants.RegistryConstants;
+import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.apache.dubbo.demo.DemoService;
 import org.apache.dubbo.demo.consumer.comp.DemoServiceComponent;
 
+import org.apache.dubbo.registry.Registry;
+import org.apache.dubbo.registry.RegistryFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +39,16 @@ public class Application {
      * launch the application
      */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
+        ExtensionLoader<RegistryFactory> extensionLoader = ExtensionLoader.getExtensionLoader(RegistryFactory.class);
+        Registry registry = extensionLoader.getAdaptiveExtension().getRegistry(URL.valueOf("zookeeper://127.0.0.1:2181"));
+        // 订阅DemoService的 Consumer Url，通过注册中心返回的 url 列表，得到消费者数量。
+        registry.subscribe(URL.valueOf("consumer://192.168.1.5/" + DemoService.class.getName()
+                + "?" + RegistryConstants.CATEGORY_KEY + "=" + RegistryConstants.CONSUMERS_CATEGORY), (urls) -> {
+            for (URL url : urls) {
+                System.out.println(" -------- " + url);
+            }
+        });
+
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConsumerConfiguration.class);
         context.start();
         DemoService service = context.getBean("demoServiceComponent", DemoServiceComponent.class);
