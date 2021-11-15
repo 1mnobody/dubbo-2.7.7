@@ -129,7 +129,8 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         registerBeans(registry, DubboBootstrapApplicationListener.class);
 
         Set<String> resolvedPackagesToScan = resolvePackagesToScan(packagesToScan);
-
+        // spring的回调方法，postProcessBeanDefinitionRegistry是在所有Bean定义信息将要被加载，Bean实例还未创建的时候执行。
+        // 这里加载了 @DubboService  @Service 注解的 beanDefinition。
         if (!CollectionUtils.isEmpty(resolvedPackagesToScan)) {
             registerServiceBeans(resolvedPackagesToScan, registry);
         } else {
@@ -156,6 +157,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         scanner.setBeanNameGenerator(beanNameGenerator);
 
         // refactor @since 2.7.7
+        // 这些 beanDefinition 首先被 spring 的 bean scanner 扫描到 Spring 容器中
         serviceAnnotationTypes.forEach(annotationType -> {
             scanner.addIncludeFilter(new AnnotationTypeFilter(annotationType));
         });
@@ -170,7 +172,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
                     findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
 
             if (!CollectionUtils.isEmpty(beanDefinitionHolders)) {
-
+                // 对于注入到Spring容器中的Dubbo Service，再注册一个对应的ServiceBean到Spring容器中。
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
                     registerServiceBean(beanDefinitionHolder, registry, scanner);
                 }
@@ -400,6 +402,14 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         propertyValues.addPropertyValues(new AnnotationPropertyValuesAdapter(serviceAnnotation, environment, ignoreAttributeNames));
 
         // References "ref" property to annotated-@Service Bean
+        // wuzhsh:
+        // 注意上面这句注释，这里将 ServiceBean 的 ref 赋值为 标注了@Service注解的 bean，比如 DemoService 实例，注入到Spring 容器中之后
+        // 会创建一个 ServiceBean，这个ServiceBean 的 ref 指向了实际的 DemoService 实例。
+        // 这里的这个 annotatedServiceBeanName 就是 DemoService 在 Spring 容器中的 beanName，下面的这个 addPropertyReference 方法
+        // 实际上就是把属性和一个 RuntimeBeanReference（结合beanName） 绑定起来。
+        // spring在解析 BeanDefinition 时，遇到RuntimeBeanReference，会从 BeanFactory 中根据 beanName 取出对应的 bean实例，设置到对应的属性上（这里就是ref）
+        // 详细处理在 BeanDefinitionValueResolver.resolveValueIfNecessary 方法中
+        // 这样就把 ServiceBean 和 实际的本地 Service绑定起来了
         addPropertyReference(builder, "ref", annotatedServiceBeanName);
         // Set interface
         builder.addPropertyValue("interface", interfaceClass.getName());
