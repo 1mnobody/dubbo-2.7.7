@@ -193,7 +193,7 @@ public class RegistryProtocol implements Protocol {
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
         URL registryUrl = getRegistryUrl(originInvoker);
-        // url to export locally
+        // url to export locally， wuzhsh：这里拿到的 providerUrl 是 originInvoker 的 url 的 export 参数，值的形式是 dubbo://192.168.x.x:20880/...
         URL providerUrl = getProviderUrl(originInvoker);
 
         // Subscribe the override data
@@ -205,7 +205,7 @@ public class RegistryProtocol implements Protocol {
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
 
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
-        //export invoker
+        //export invoker  wuzhsh：在doLocalExport里会开启端口进行监听（providerUrl的schema是 dubbo，因此会调用 DubboProtocol 的export方法）
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // url to registry
@@ -252,7 +252,7 @@ public class RegistryProtocol implements Protocol {
     @SuppressWarnings("unchecked")
     private <T> ExporterChangeableWrapper<T> doLocalExport(final Invoker<T> originInvoker, URL providerUrl) {
         String key = getCacheKey(originInvoker);
-        // key 就是一个url，这里把 url和 exporter关联起来了
+        // key 就是一个url，这里把 url和 exporter关联起来了，url 格式：dubbo://xxxxx/xxx
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
             return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
