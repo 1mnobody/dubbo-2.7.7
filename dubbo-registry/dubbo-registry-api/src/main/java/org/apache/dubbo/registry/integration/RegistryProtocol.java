@@ -252,7 +252,7 @@ public class RegistryProtocol implements Protocol {
     @SuppressWarnings("unchecked")
     private <T> ExporterChangeableWrapper<T> doLocalExport(final Invoker<T> originInvoker, URL providerUrl) {
         String key = getCacheKey(originInvoker);
-
+        // key 就是一个url，这里把 url和 exporter关联起来了
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
             return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
@@ -466,7 +466,7 @@ public class RegistryProtocol implements Protocol {
     private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
         RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
         directory.setRegistry(registry);
-        // 此类中的 protocol 实例在创建时会借助 dubbo 自身实现的IOC来注入 （ExtensionLoader.injectExtension），
+        // wuzhsh: 此类中的 protocol 实例在创建时会借助 dubbo 自身实现的IOC来注入 （ExtensionLoader.injectExtension），
         // 这个所谓的IOC简单来说就是 通过 ExtensionLoader 创建的实例，会调用该实例的所有 setter 方法，set进去的值是从 ExtensionLoader 中获取到的实例，
         // 比如 RegistryProtocol 就有一个 setProtocol() 方法，那么 ExtensionLoader 在创建 RegistryProtocol 实例之后，会调用这个 setProtocol 方法，
         // 而传入到该方法的 protocol 实例就是 ExtensionLoader#getAdaptiveExtension（一个 Protocol$Adaptive 实例）

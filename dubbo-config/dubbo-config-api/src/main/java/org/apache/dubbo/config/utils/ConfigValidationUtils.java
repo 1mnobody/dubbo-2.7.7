@@ -170,7 +170,7 @@ public class ConfigValidationUtils {
         // check && override if necessary
         List<URL> registryList = new ArrayList<URL>();
         ApplicationConfig application = interfaceConfig.getApplication();
-        // 这里的registries对应的就是配置：<dubbo:registry address="zookeeper://127.0.0.1:2181" port="2181" protocol="zookeeper" />
+        // wuzhsh: 这里的registries对应的就是配置：<dubbo:registry address="zookeeper://127.0.0.1:2181" port="2181" protocol="zookeeper" />
         List<RegistryConfig> registries = interfaceConfig.getRegistries();
         if (CollectionUtils.isNotEmpty(registries)) {
             for (RegistryConfig config : registries) {

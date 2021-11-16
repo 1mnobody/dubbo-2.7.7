@@ -116,6 +116,8 @@ public class ServiceRepository extends LifecycleAdapter implements FrameworkExt 
                                  ServiceDescriptor serviceModel,
                                  ServiceConfigBase<?> serviceConfig,
                                  ServiceMetadata serviceMetadata) {
+        // wuzhsh: 这里解析Service信息（Service实例、Service的方法列表）来构建一个Provider，并与 serviceKey 关联起来
+        // 推断 在RPC调用时，会通过 serviceKey 找到实际的Provider，以进行实际Service方法的调用
         ProviderModel providerModel = new ProviderModel(serviceKey, serviceInstance, serviceModel, serviceConfig,
                 serviceMetadata);
         providers.putIfAbsent(serviceKey, providerModel);

@@ -49,6 +49,8 @@ public class DubboBootstrapApplicationListener extends OneTimeExecutionApplicati
     @Override
     public void onApplicationContextEvent(ApplicationContextEvent event) {
         if (event instanceof ContextRefreshedEvent) {
+            // wuzhsh
+            // 监听 spring 容器的 ApplicationContextEvent，这里验证其是否是 ContextRefreshedEvent，随后暴露服务（ServiceBean#export）供远程调用
             onContextRefreshedEvent((ContextRefreshedEvent) event);
         } else if (event instanceof ContextClosedEvent) {
             onContextClosedEvent((ContextClosedEvent) event);

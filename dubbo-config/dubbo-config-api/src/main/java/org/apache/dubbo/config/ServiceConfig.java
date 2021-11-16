@@ -311,7 +311,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 this,
                 serviceMetadata
         );
-
+        // wuzhsh: registryURLs 是从 <dubbo:registry/> 中解析出来的url，这些url的Protocol都被设置为 service-discovery-registry 或者 registry 了。
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
         for (ProtocolConfig protocolConfig : protocols) {
@@ -489,6 +489,9 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
+                        // Protocol$Adaptive 的代码具体可以查看 dubbo-demo工程下的 Protocol$Adaptive.java文件
+                        // 可以看到，export方法会通过传入的 invoker 的 url 属性来决定调用哪个 Protocol 实现类，这里很明显，
+                        // invoker 里的url 是一个registryURL，所以会进到 RegistryProtocol 中
                         Exporter<?> exporter = PROTOCOL.export(wrapperInvoker);
                         exporters.add(exporter);
                     }
