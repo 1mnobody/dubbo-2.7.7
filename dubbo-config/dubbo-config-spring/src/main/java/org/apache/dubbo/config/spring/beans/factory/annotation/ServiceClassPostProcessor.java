@@ -402,8 +402,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         propertyValues.addPropertyValues(new AnnotationPropertyValuesAdapter(serviceAnnotation, environment, ignoreAttributeNames));
 
         // References "ref" property to annotated-@Service Bean
-        // wuzhsh:
-        // 注意上面这句注释，这里将 ServiceBean 的 ref 赋值为 标注了@Service注解的 bean，比如 DemoService 实例，注入到Spring 容器中之后
+        // wuzhsh:注意上面这句注释，这里将 ServiceBean 的 ref 赋值为 标注了@Service注解的 bean，比如 DemoService 实例，注入到Spring 容器中之后
         // 会创建一个 ServiceBean，这个ServiceBean 的 ref 指向了实际的 DemoService 实例。
         // 这里的这个 annotatedServiceBeanName 就是 DemoService 在 Spring 容器中的 beanName，下面的这个 addPropertyReference 方法
         // 实际上就是把属性和一个 RuntimeBeanReference（结合beanName） 绑定起来。

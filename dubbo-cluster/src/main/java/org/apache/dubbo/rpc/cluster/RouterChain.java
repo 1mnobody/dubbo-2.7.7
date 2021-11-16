@@ -47,6 +47,8 @@ public class RouterChain<T> {
     }
 
     private RouterChain(URL url) {
+        // 获取标注了@Activate注解的几个 RouterFactory
+        //（dubbo-cluster下的org.apache.dubbo.rpc.cluster.RouterFactory 中写了7个Extension，实际只会取其中的4个）
         List<RouterFactory> extensionFactories = ExtensionLoader.getExtensionLoader(RouterFactory.class)
                 .getActivateExtension(url, "router");
 
