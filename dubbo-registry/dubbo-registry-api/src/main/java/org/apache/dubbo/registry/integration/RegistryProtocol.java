@@ -479,8 +479,9 @@ public class RegistryProtocol implements Protocol {
             registry.register(directory.getRegisteredConsumerUrl());
         }
         directory.buildRouterChain(subscribeUrl);
-        // subscribe 最终会调用 registry 的 subscribe 方法，对于 ZookeeperRegistry，这里会调用通过 notify 方法
-        //回调到 directory 的 notify 方法（因为 directory 实现了 NotifyListener 接口）
+        // wuzhsh: subscribe 最终会调用 registry 的 subscribe 方法，对于 ZookeeperRegistry，这里会调用通过 notify 方法
+        // 回调到 directory 的 notify 方法（因为 directory 实现了 NotifyListener 接口），
+        // 从而刷新 RegistryDirectory 中的 invokers 列表，上层获取到的 invoker 其实就是对 RegistryDirectory 中的 invokers 做一个包装
         directory.subscribe(toSubscribeUrl(subscribeUrl));
 
         Invoker<T> invoker = cluster.join(directory);

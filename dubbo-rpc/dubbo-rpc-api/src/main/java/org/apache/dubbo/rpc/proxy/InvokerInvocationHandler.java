@@ -36,6 +36,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
     private ConsumerModel consumerModel;
 
     public InvokerInvocationHandler(Invoker<?> handler) {
+        // 这里的这个invoker已经可以获取到服务端的连接
         this.invoker = handler;
         String serviceKey = invoker.getUrl().getServiceKey();
         if (serviceKey != null) {
@@ -45,6 +46,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // Consumer 端Service的代理入口方法，默认情况下，这个 invoker  是一个 DubboInvoker 的包装类，实际上调用的是 DubboInvoker 里的 invoke 方法
         if (method.getDeclaringClass() == Object.class) {
             return method.invoke(invoker, args);
         }

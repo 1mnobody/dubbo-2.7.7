@@ -76,6 +76,7 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
         interfaces.add(invoker.getInterface());
         interfaces.addAll(Arrays.asList(INTERNAL_INTERFACES));
 
+        // wuzhsh: 无论是 JdkProxyFactory 还是 JavassistProxyFactory 都是创建一个 InvokerInvocationHandler 来调用实际的 Service 中的方法。
         return getProxy(invoker, interfaces.toArray(new Class<?>[0]));
     }
 

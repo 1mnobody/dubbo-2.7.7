@@ -374,7 +374,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             metadataService.publishServiceDefinition(consumerURL);
         }
         // create service proxy
-        // 这里生成实际的业务 Service 类（比如 DemoService），生成的代理直接与 Invoker 绑定，后续在调用 Service 方法时，会通过Invoker去进行实际的调用
+        // 这里生成实际的业务 Service 类代理（比如 DemoService的代理类），生成的代理直接与 Invoker 绑定，后续在调用 Service 方法时，会通过Invoker去进行实际的调用
         return (T) PROXY_FACTORY.getProxy(invoker, ProtocolUtils.isGeneric(generic));
     }
 
